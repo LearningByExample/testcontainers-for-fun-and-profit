@@ -57,14 +57,161 @@
 					</div>
 				</section>
 				<section>
-					<h1>Integration Tests</h1>
-					<blockquote style="text-align: left;">
-						<span style="color:rgb(0, 225, 255)">The point</span> of integration testing, as the name suggests, is to <span style="color:rgb(0, 225, 255)">test</span> whether many separately developed <span style="color:rgb(255, 225, 0)">modules work together</span> as expected. 
-					<br/>
-					<br/>
-					<div align="right"><small><a target="_blank" href="https://martinfowler.com/bliki/IntegrationTest.html">Martin Fowler</a></small></div>
-					</blockquote>
+					<section>
+						<h1>Integration Tests</h1>
+						<blockquote style="text-align: left;">
+							<span style="color:rgb(0, 225, 255)">The point</span> of integration testing, as the name suggests, is to <span style="color:rgb(0, 225, 255)">test</span> whether many separately developed <span style="color:rgb(255, 225, 0)">modules work together</span> as expected.
+						<br/>
+						<br/>
+						<div align="right"><small><a target="_blank" href="https://martinfowler.com/bliki/IntegrationTest.html">Martin Fowler</a></small></div>
+						</blockquote>
+					</section>
+					<section>
+						<center>
+							<div style="width: 70%; float:inherit" align="center">
+								<h1>Tests</h1>
+								<h2 align="left">Should be <span style="color:rgb(0, 255, 0)">Reliable</span></h2>
+								<h2 align="right">and give <span style="color:rgb(255, 255, 0)">Certainty</span></h2>
+							</div>
+						</center>
+					</section>
+					<section>
+						<center>
+							<div style="width: 90%; float:inherit" align="center">
+								<h1>Mocks</h1>
+								<h2 align="left">They could <span style="color:rgb(0, 255, 0)">leak</span></h2>
+								<h2 align="right"><span style="color:rgb(255, 255, 0)">implementation</span> details</h2>
+							</div>
+						</center>
+					</section>
+					<section style="width: 100%">
+						<small>Leaking Mock Example</small>
+						<pre style="width: 100%"><code class="java" data-trim >
+class CustomerService {
+	....
+	public boolean saveOrUpdateCustomer(final Customer customer) {
+		final Optional&lt;Customer&gt; result = customerRepository.findById(customer.getId());
+
+		if (result.isPresent())) {
+			customerRepository.update(customer);
+			return true;
+		} else {
+			customerRepository.save(customer);
+			return false;
+		}
+	}
+}
+						</code></pre>
+						<pre style="width: 100%"><code class="java" data-trim >
+class CustomerServiceTest {
+	@Test
+	public void testSaveOrUpdateCustomer() {
+		final Customer testCustomer = new Customer(1, "John", "Doe");
+
+		final customerRepositoryMock = mock(CustomerRepository.class);
+		given(customerRepositoryMock.findCustomerById(testCustomer.getId()))
+			.willReturn(Optional.empty());
+		given(customerRepositoryMock.update(testCustomer))
+			.doNothing();
+
+		final CustomerService service = new CustomerService(customerRepositoryMock);
+		assertThat(service.saveOrUpdateCustomer(customer)).equalsTo(true);
+	}
+}
+						</code></pre>
+					</section>
+					<section>
+						<center>
+							<div style="width: 90%; float:inherit" align="center">
+								<h1>Fakes</h1>
+								<h2 align="left">They are as <span style="color:rgb(0, 255, 0)">good</span></h2>
+								<h2 align="right">as they are <span style="color:rgb(255, 255, 0)">reliable</span></h2>
+							</div>
+						</center>
+					</section>
+					<section>
+						<h3>H2 in memory database vs PostgreSQL</h3>
+						<br />
+						<div align="left">
+							<ul>
+								<li>Does not support XML queries</li>
+								<li>No Windows Functions</li>
+								<li>No JSON types</li>
+								<li>No TO_TIMESTAMP</li>
+							</ul>
+						</div>
+					</section>					
 				</section>
+				<section>
+					<section>
+						<h1>TestContainers</h1>
+						<blockquote style="text-align: left;">
+							Testcontainers is a Java library that supports JUnit tests, providing <span style="color:rgb(0, 225, 255)">lightweight, throwaway instances</span> of common databases, Selenium web browsers, or <span style="color:rgb(255, 255, 0)">anything</span> else that can run <span style="color:rgb(255, 255, 0)">in a Docker container</span>.
+						<br/>
+						<br/>
+						<div align="right"><small><a target="_blank" href="https://www.testcontainers.org/">testcontainers.org</a></small></div>
+						</blockquote>
+					</section>	
+					<section>
+						<h3>Some of Databases supported</h3>
+						<br />
+						<div align="left">
+							<ul>
+								<li>DB2</li>								
+								<li>Oracle</li>
+								<li>PostgresSQL</li>
+								<li>MongoDB</li>
+								<li>InfluxDB</li>
+								<li>Neo4J</li>
+								<li>Cassandra</li>
+								<li>MySQL & MariaDB</li>
+								<li>Couchbase</li>
+								<li>Elasticsearch</li>
+							</ul>
+						</div>
+					</section>	
+					<section>
+						<h3>And many other Modules</h3>
+						<br />
+						<div align="left">
+							<ul>
+								<li>Kafka</li>								
+								<li>RabbitMQ</li>
+								<li>Solr</li>
+								<li>Apache Pulsar</li>
+								<li>Hashicorp Vault</li>
+								<li>Webdriver</li>								
+								<li>Nginx</li>
+								<li>JDBC</li>								
+								<li>R2DBC</li>
+								<li>ToxiProxy</li>								
+							</ul>
+						</div>
+					</section>		
+					<section>
+						<center>
+							<div style="width: 90%; float:inherit" align="center">
+								<h1>Additionally</h1>
+								<h2 align="left">You could <span style="color:rgb(0, 255, 0)">create</span> any</h2>
+								<h2 align="right"><span style="color:rgb(255, 255, 0)">custom docker</span> for your tests</h2>
+							</div>
+						</center>
+					</section>											
+				</section>
+				<section width="100%">
+					<center>
+						<div style="width: 60%; float:inherit" align="center">
+							<h1>Demo Time</h1>
+							<h2 align="left">Let's <span style="color:rgb(0, 225, 255)">have fun</span></h2>
+							<h2 align="right">doing an <span style="color:rgb(255, 255, 0)">example</span></h2>
+						</div>
+						<br />
+						<small>
+						<a target="_blank" href="https://github.com/LearningByExample/testcontainers-for-fun-and-profit"><i
+								class="fab fa-github"></i>&nbsp;https://github.com/LearningByExample/testcontainers-for-fun-and-profit
+						</a></small>
+					</center>
+				</section>				
 				<section>
 					<center>
 						<div style="width: 60%; float:inherit" align="center">

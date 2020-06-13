@@ -1,11 +1,11 @@
 package com.santanderuk.demo.testcontainers;
 
-import com.google.gson.Gson;
+import com.santanderuk.demo.testcontainers.repository.CustomerRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -15,12 +15,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.Objects;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -28,8 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class ControllerTest {
 
-    private static final Customer VALID_BODY = new Customer(
-            "Estefania", "Castro", "more details");
     private static final String DATASOURCE_URL_PROPERTY = "spring.datasource.url";
     private static final String DATABASE = "people";
     private static final String USER = "estefania";
@@ -53,38 +47,32 @@ public class ControllerTest {
     }
 
     @Test
-    void getResponseOK() throws Exception {
-        final String body = new Gson().toJson(VALID_BODY);
-
-        final MvcResult mvcResult = mockMvc.perform(post("/customer")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
-                .andExpect(header().exists(HttpHeaders.LOCATION))
-                .andExpect(status().isCreated())
+    @DisplayName("The service should response with the customer when the id exists")
+    void shouldGetOkWhenUserExists() throws Exception {
+        final MvcResult mvcResult = mockMvc.perform(get("/customer/{id}", 1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Estefania"))
+                .andExpect(jsonPath("$.surName").value("Castro"))
+                .andExpect(jsonPath("$.details").value("awesome"))
                 .andReturn();
-
-        final Long id = Long.valueOf(Objects.requireNonNull(
-                mvcResult.getResponse().getHeaderValue(HttpHeaders.LOCATION))
-                .toString()
-                .split("/")[2]);
-        checkDatabaseRecords(id);
-    }
-
-    private void checkDatabaseRecords(final Long id) {
-        final Optional<Customer> customer = customerRepository.findById(id);
-        assertThat(customer).isPresent();
-        assertThat(customer.get().getName()).isEqualTo(VALID_BODY.getName());
-        assertThat(customer.get().getSurName()).isEqualTo(VALID_BODY.getSurName());
-        assertThat(customer.get().getDetails()).isEqualTo(VALID_BODY.getDetails());
     }
 
     @Test
-    void getBadRequestWhenBodyIsNotSend() throws Exception {
-        mockMvc.perform(post("/customer")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(header().doesNotExist(HttpHeaders.LOCATION))
-                .andExpect(status().isBadRequest());
+    @DisplayName("The service should response with not found when the id does not exists")
+    void shouldGetNotFoundWhenUserDoesNotExist() throws Exception {
+        final MvcResult mvcResult = mockMvc.perform(get("/customer/{id}", 10)
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isNotFound())
+            .andReturn();
+    }
+
+    @Test
+    @DisplayName("The service should response with bad request when the id param is incorrect")
+    void getResponseOKaa() throws Exception {
+        final MvcResult mvcResult = mockMvc.perform(get("/customer/{id}", "4a")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isBadRequest())
+            .andReturn();
     }
 }

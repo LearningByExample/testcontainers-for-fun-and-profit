@@ -1,10 +1,13 @@
-package com.santanderuk.demo.testcontainers;
+package com.santanderuk.demo.testcontainers.model;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Objects;
 
 @Entity
-public class Customer {
+public class CustomerDTO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -45,10 +48,10 @@ public class Customer {
         this.details = details;
     }
 
-    public Customer() {
+    public CustomerDTO() {
     }
 
-    public Customer(String name, String surName, String details) {
+    public CustomerDTO(String name, String surName, String details) {
         this.name = name;
         this.surName = surName;
         this.details = details;
@@ -68,11 +71,11 @@ public class Customer {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Customer customer = (Customer) o;
-        return Objects.equals(id, customer.id) &&
-                Objects.equals(name, customer.name) &&
-                Objects.equals(surName, customer.surName) &&
-                Objects.equals(details, customer.details);
+        CustomerDTO customerDTO = (CustomerDTO) o;
+        return Objects.equals(id, customerDTO.id) &&
+                Objects.equals(name, customerDTO.name) &&
+                Objects.equals(surName, customerDTO.surName) &&
+                Objects.equals(details, customerDTO.details);
     }
 
     @Override

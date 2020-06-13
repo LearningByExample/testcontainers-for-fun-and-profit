@@ -212,6 +212,128 @@ class CustomerServiceTest {
 						</a></small>
 					</center>
 				</section>
+				<section width="100%">
+					<section>
+						<center>
+							<div style="width: 60%; float:inherit" align="center">
+								<h1>Profit</h1>
+								<h2 align="left">Let's <span style="color:rgb(0, 225, 255)">think</span> on</h2>
+								<h2 align="right"><span style="color:rgb(255, 255, 0)">future</span> usages</h2>
+							</div>						
+						</center>
+					</section>						
+					<section>
+						<h3>TestContainers is supported</h3>
+						<br />
+						<div align="left">
+							<ul>
+								<li>Travis</li>
+								<li>CircleCI</li>
+								<li>Github Actions</li>
+								<li>GitLab Pipelines</li>
+								<li>Jenkins</li>
+							</ul>
+						</div>
+					</section>
+					<section>
+						<h3>Growing Ecosystem</h3>
+						<br />
+						<div align="left">
+							<ul>
+								<li>Pivotal spring-cloud-aws using localstack</li>
+								<li>Lighbend and Alpakka Kafka</li>
+								<li>Transferwise and RDBMS tests</li>								
+								<li>Apache Camel using consul & etcd</li>
+								<li>Infinispan using LDAP & KeyCloack</li>
+								<li>eBay Marketing using Redis & Kafka</li>
+							</ul>
+						</div>
+					</section>		
+					<section style="width: 100%">
+						Using DR Header
+						<br/>
+						<small>
+							<a target="_blank" href="https://github.com/juan-medina/drheader-junit-test-containers"><i
+									class="fab fa-github"></i>&nbsp;https://github.com/juan-medina/drheader-junit-test-containers
+							</a></small>						
+						<pre style="width: 100%"><code class="java" data-trim >
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class DrTests {
+    @BeforeEach
+    void setup() {
+      Testcontainers.exposeHostPorts(port);
+      drHEADerContainer = new GenericContainer(
+        new ImageFromDockerfile("drheader", true)
+          .withDockerfileFromBuilder(builder ->
+          builder.from("python:3.7.4")
+            .run("git clone https://github.com/Santandersecurityresearch/DrHeader.git")
+            .run("cd DrHeader && git checkout master && git pull && pip install .")
+            .entryPoint("tail -f /dev/null")
+            .build()));
+      drHEADerContainer.start();
+    }
+
+    @AfterEach
+    void tearDown() {
+       drHEADerContainer.stop();
+    }	
+}
+
+						</code></pre>
+					</section>	
+					<section style="width: 100%">					
+						<pre style="width: 100%"><code class="java" data-trim >
+
+private void drHEADer(final String url) throws Exception {
+  final String testUrl = String.format(TEST_CONTAINERS_INTERNAL_URL, port, url);
+  final ExecResult execResult = drHEADerContainer.
+    execInContainer("drheader", "scan", "single", testUrl);
+  
+  if (execResult.getExitCode() != 0) {
+    throw new AssertionError(String.format("Error on drHEADer analysis : \n%s", 
+     execResult.getStdout()));
+  }
+}
+
+@Test
+@DisplayName("Index should not have drHEADer errors")
+void IndexShouldNotHaveDrHEADerErrors() throws Exception {
+	drHEADer("/index.html");
+}
+						</code></pre>
+					</section>		
+					<section style="width: 100%">
+						Using TestContainers with Resilience4j to test failures
+						<br/>
+						<small>
+							<a target="_blank" href="https://github.com/LearningByExample/testing-resilience"><i
+									class="fab fa-github"></i>&nbsp;https://github.com/LearningByExample/testing-resilience
+							</a></small>
+							<pre style="width: 100%"><code class="java" data-trim >
+@Test
+void whenShouldRecover() throws Exception {
+	stopDatabase();
+	assertServiceIsReady(false);
+
+	startDatabase();
+	loadInitData();
+	assertServiceIsReady(true);
+	assertOffersAre(INITIAL_OFFERS);
+
+	stopDatabase();
+	assertServiceIsReady(true);
+	assertOffersAre(INITIAL_OFFERS);
+
+	startDatabase();
+	loadInitData();
+	addVanillaCookies();
+	assertServiceIsReady(true);
+	assertOffersAre(ADDITIONAL_OFFERS);
+}
+																 
+							</code></pre>							
+					</section>																			
+				</section>				
 				<section>
 					<center>
 						<div style="width: 60%; float:inherit" align="center">

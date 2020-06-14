@@ -4,7 +4,8 @@
 
 This is the demo repository for the talk TestContainers for Fun aand Profit.
 
-The presentation is available at: https://learningbyexample.github.io/testcontainers-for-fun-and-profit/
+The presentation is available at: 
+https://learningbyexample.github.io/testcontainers-for-fun-and-profit/
 
 To run the demo example just do: 
 ```bash

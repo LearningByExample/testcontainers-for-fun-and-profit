@@ -1,6 +1,6 @@
-package com.santanderuk.demo.testcontainers.repository;
+package org.learning.by.example.testcontainers.forfun.repository;
 
-import com.santanderuk.demo.testcontainers.model.Customer;
+import org.learning.by.example.testcontainers.forfun.model.Customer;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.santanderuk.demo.testcontainers.model;
+package org.learning.by.example.testcontainers.forfun.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

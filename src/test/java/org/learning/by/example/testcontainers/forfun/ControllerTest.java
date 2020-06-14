@@ -1,7 +1,7 @@
-package com.santanderuk.demo.testcontainers;
+package org.learning.by.example.testcontainers.forfun;
 
-import com.santanderuk.demo.testcontainers.model.Customer;
-import com.santanderuk.demo.testcontainers.repository.CustomerRepository;
+import org.learning.by.example.testcontainers.forfun.model.Customer;
+import org.learning.by.example.testcontainers.forfun.repository.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

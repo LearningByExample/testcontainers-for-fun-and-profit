@@ -1,7 +1,7 @@
-package com.santanderuk.demo.testcontainers.controller;
+package org.learning.by.example.testcontainers.forfun.controller;
 
-import com.santanderuk.demo.testcontainers.model.Customer;
-import com.santanderuk.demo.testcontainers.repository.CustomerRepository;
+import org.learning.by.example.testcontainers.forfun.model.Customer;
+import org.learning.by.example.testcontainers.forfun.repository.CustomerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

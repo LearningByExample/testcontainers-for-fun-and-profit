@@ -1,4 +1,4 @@
-package com.santanderuk.demo.testcontainers;
+package org.learning.by.example.testcontainers.forfun;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

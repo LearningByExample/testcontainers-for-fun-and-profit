@@ -1,10 +1,12 @@
 # TestContainers for Fun and Profit
-TBC
 
 [![License: Apache2](https://img.shields.io/badge/license-Apache%202-blue.svg)](/LICENSE)
 
-https://learningbyexample.github.io/testcontainers-for-fun-and-profit/
+This is the demo repository for the talk TestContainers for Fun aand Profit.
 
-TBC
+The presentation is available at: https://learningbyexample.github.io/testcontainers-for-fun-and-profit/
 
-# TBC
+To run the demo example just do: 
+```bash
+$ mvnw clean test
+```

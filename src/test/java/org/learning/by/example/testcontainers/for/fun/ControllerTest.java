@@ -25,15 +25,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class ControllerTest {
     private static final String DATASOURCE_URL_PROPERTY = "spring.datasource.url";
+    private static final String DATASOURCE_URL_USER = "spring.datasource.username";
+    private static final String DATASOURCE_URL_PASSWORD = "spring.datasource.password";
     private static final String DATABASE = "customers";
     private static final String USER = "userTest";
     private static final String PASSWORD = "userTestPwd";
 
-    @Autowired
-    private MockMvc mockMvc;
+    private final MockMvc mockMvc;
+    private final CustomerRepository customerRepository;
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    public ControllerTest(@Autowired MockMvc mockMvc, @Autowired CustomerRepository customerRepository) {
+        this.mockMvc = mockMvc;
+        this.customerRepository = customerRepository;
+    }
 
     @BeforeEach
     void setUp() {
@@ -41,14 +45,16 @@ public class ControllerTest {
     }
 
     @Container
-    private static final PostgreSQLContainer POSTGRES_SQL_CONTAINER = new PostgreSQLContainer()
+    private static final PostgreSQLContainer POSTGRESQL_CONTAINER = new PostgreSQLContainer()
             .withDatabaseName(DATABASE)
             .withUsername(USER)
             .withPassword(PASSWORD);
 
     @DynamicPropertySource
-    static void postgresSQLProperties(final DynamicPropertyRegistry registry) {
-        registry.add(DATASOURCE_URL_PROPERTY, POSTGRES_SQL_CONTAINER::getJdbcUrl);
+    static void setUpProperties(final DynamicPropertyRegistry registry) {
+        registry.add(DATASOURCE_URL_PROPERTY, POSTGRESQL_CONTAINER::getJdbcUrl);
+        registry.add(DATASOURCE_URL_USER, POSTGRESQL_CONTAINER::getUsername);
+        registry.add(DATASOURCE_URL_PASSWORD, POSTGRESQL_CONTAINER::getPassword);
     }
 
     @Test

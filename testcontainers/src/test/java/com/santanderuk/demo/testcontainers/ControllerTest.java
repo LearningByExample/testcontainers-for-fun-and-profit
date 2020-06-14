@@ -1,24 +1,28 @@
 package com.santanderuk.demo.testcontainers;
 
+import com.santanderuk.demo.testcontainers.model.Customer;
 import com.santanderuk.demo.testcontainers.repository.CustomerRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-//@Testcontainers
+@Testcontainers
 @AutoConfigureMockMvc
-@Sql(scripts = {"classpath:import_customers.sql"})
 public class ControllerTest {
     private static final String DATASOURCE_URL_PROPERTY = "spring.datasource.url";
     private static final String DATABASE = "customers";
@@ -31,37 +35,42 @@ public class ControllerTest {
     @Autowired
     private CustomerRepository customerRepository;
 
-//    @Container
-//    private static final PostgreSQLContainer POSTGRES_SQL_CONTAINER = new PostgreSQLContainer()
-//            .withDatabaseName(DATABASE)
-//            .withUsername(USER)
-//            .withPassword(PASSWORD);
-//
-//    @DynamicPropertySource
-//    static void postgresSQLProperties(final DynamicPropertyRegistry registry) {
-//        registry.add(DATASOURCE_URL_PROPERTY, POSTGRES_SQL_CONTAINER::getJdbcUrl);
-//    }
+    @BeforeEach
+    void setUp() {
+        customerRepository.deleteAll();
+    }
+
+    @Container
+    private static final PostgreSQLContainer POSTGRES_SQL_CONTAINER = new PostgreSQLContainer()
+            .withDatabaseName(DATABASE)
+            .withUsername(USER)
+            .withPassword(PASSWORD);
+
+    @DynamicPropertySource
+    static void postgresSQLProperties(final DynamicPropertyRegistry registry) {
+        registry.add(DATASOURCE_URL_PROPERTY, POSTGRES_SQL_CONTAINER::getJdbcUrl);
+    }
 
     @Test
     @DisplayName("The service should response with the customer when the id exists")
     void shouldGetOkWhenUserExists() throws Exception {
-        final MvcResult mvcResult = mockMvc.perform(get("/customer/{id}", 1)
+        final Customer customer = new Customer("Estefania", "Castro", "more details");
+        customerRepository.save(customer);
+
+        mockMvc.perform(get("/customer/{id}", customer.getId())
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("Estefania"))
-                .andExpect(jsonPath("$.surName").value("Castro"))
-                .andExpect(jsonPath("$.details").value("more details"))
-                .andReturn();
+                .andExpect(jsonPath("$.id").value(customer.getId()))
+                .andExpect(jsonPath("$.name").value(customer.getName()))
+                .andExpect(jsonPath("$.surName").value(customer.getSurName()))
+                .andExpect(jsonPath("$.details").value(customer.getDetails()));
     }
 
     @Test
     @DisplayName("The service should response with not found when the id does not exists")
     void shouldGetNotFoundWhenUserDoesNotExist() throws Exception {
-        final MvcResult mvcResult = mockMvc.perform(get("/customer/{id}", Long.MAX_VALUE)
+        mockMvc.perform(get("/customer/{id}", Long.MAX_VALUE)
             .contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(status().isNotFound())
-            .andReturn();
+            .andExpect(status().isNotFound());
     }
-
 }

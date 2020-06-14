@@ -1,0 +1,15 @@
+## PostgreSQL
+spring:
+    datasource:
+        url: jdbc:postgresql://localhost:5432/customers
+        username: estefania
+        password: estefaniapwd
+
+    ## drop n create table again, good for testing, comment this in production
+    jpa:
+        hibernate:
+            ddl-auto: create
+        show-sql: true
+
+#psql -h localhost -p 5432 -U estefania customers
+#docker run --name pet-postgres -e POSTGRES_USER=estefania -e POSTGRES_PASSWORD=estefaniapwd -e POSTGRES_DB=customers -d -p 5432:5432 postgres

@@ -6,8 +6,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.Objects;
 
-@Entity
-public class CustomerDTO {
+@Entity(name ="customers")
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -48,10 +48,10 @@ public class CustomerDTO {
         this.details = details;
     }
 
-    public CustomerDTO() {
+    public Customer() {
     }
 
-    public CustomerDTO(String name, String surName, String details) {
+    public Customer(String name, String surName, String details) {
         this.name = name;
         this.surName = surName;
         this.details = details;
@@ -71,11 +71,11 @@ public class CustomerDTO {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CustomerDTO customerDTO = (CustomerDTO) o;
-        return Objects.equals(id, customerDTO.id) &&
-                Objects.equals(name, customerDTO.name) &&
-                Objects.equals(surName, customerDTO.surName) &&
-                Objects.equals(details, customerDTO.details);
+        Customer customer = (Customer) o;
+        return Objects.equals(id, customer.id) &&
+                Objects.equals(name, customer.name) &&
+                Objects.equals(surName, customer.surName) &&
+                Objects.equals(details, customer.details);
     }
 
     @Override

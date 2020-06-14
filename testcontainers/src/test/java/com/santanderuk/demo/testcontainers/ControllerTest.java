@@ -7,27 +7,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@Testcontainers
+//@Testcontainers
 @AutoConfigureMockMvc
+@Sql(scripts = {"classpath:import_customers.sql"})
 public class ControllerTest {
-
     private static final String DATASOURCE_URL_PROPERTY = "spring.datasource.url";
-    private static final String DATABASE = "people";
-    private static final String USER = "estefania";
-    private static final String PASSWORD = "estefaniapwd";
+    private static final String DATABASE = "customers";
+    private static final String USER = "userTest";
+    private static final String PASSWORD = "userTestPwd";
 
     @Autowired
     private MockMvc mockMvc;
@@ -35,16 +31,16 @@ public class ControllerTest {
     @Autowired
     private CustomerRepository customerRepository;
 
-    @Container
-    private static final PostgreSQLContainer POSTGRES_SQL_CONTAINER = new PostgreSQLContainer()
-            .withDatabaseName(DATABASE)
-            .withUsername(USER)
-            .withPassword(PASSWORD);
-
-    @DynamicPropertySource
-    static void postgresSQLProperties(final DynamicPropertyRegistry registry) {
-        registry.add(DATASOURCE_URL_PROPERTY, POSTGRES_SQL_CONTAINER::getJdbcUrl);
-    }
+//    @Container
+//    private static final PostgreSQLContainer POSTGRES_SQL_CONTAINER = new PostgreSQLContainer()
+//            .withDatabaseName(DATABASE)
+//            .withUsername(USER)
+//            .withPassword(PASSWORD);
+//
+//    @DynamicPropertySource
+//    static void postgresSQLProperties(final DynamicPropertyRegistry registry) {
+//        registry.add(DATASOURCE_URL_PROPERTY, POSTGRES_SQL_CONTAINER::getJdbcUrl);
+//    }
 
     @Test
     @DisplayName("The service should response with the customer when the id exists")
@@ -52,27 +48,20 @@ public class ControllerTest {
         final MvcResult mvcResult = mockMvc.perform(get("/customer/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Estefania"))
                 .andExpect(jsonPath("$.surName").value("Castro"))
-                .andExpect(jsonPath("$.details").value("awesome"))
+                .andExpect(jsonPath("$.details").value("more details"))
                 .andReturn();
     }
 
     @Test
     @DisplayName("The service should response with not found when the id does not exists")
     void shouldGetNotFoundWhenUserDoesNotExist() throws Exception {
-        final MvcResult mvcResult = mockMvc.perform(get("/customer/{id}", 10)
+        final MvcResult mvcResult = mockMvc.perform(get("/customer/{id}", Long.MAX_VALUE)
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isNotFound())
             .andReturn();
     }
 
-    @Test
-    @DisplayName("The service should response with bad request when the id param is incorrect")
-    void getResponseOKaa() throws Exception {
-        final MvcResult mvcResult = mockMvc.perform(get("/customer/{id}", "4a")
-            .contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(status().isBadRequest())
-            .andReturn();
-    }
 }
